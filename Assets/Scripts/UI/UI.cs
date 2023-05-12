@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
+    [SerializeField] private GoogleAdMobController googleAdMobController;
+    [SerializeField] private GameController gameController;
+
     [SerializeField] private Sprite gameBall;
     [SerializeField] private Sprite gameBallActive;
 
@@ -26,6 +29,8 @@ public class UI : MonoBehaviour
 
     [SerializeField] private GameObject bgHeartGameWindow;
     [SerializeField] private GameObject bgSetting;
+
+    [SerializeField] private GameObject bgShop;
 
     [SerializeField] private GameObject bgHeartPrediction;
     [SerializeField] private GameObject bgError;
@@ -51,8 +56,28 @@ public class UI : MonoBehaviour
         btnSetting = bgHeaderPanel.transform.Find("btnSetting");
         btnSetting.GetComponent<Button>().onClick.AddListener(Setting);
 
+        /////////////////////////
         btnShop = bgHeaderPanel.transform.Find("btnShop");
         btnShop.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInSetting = bgSetting.transform.Find("btnShop");
+        btnShopInSetting.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInError = bgError.transform.Find("btnShop");
+        btnShopInError.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInBuyHeartPrediction = bgBuyHeartPrediction.transform.Find("btnShop");
+        btnShopInBuyHeartPrediction.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInSetting2 = bgSetting.transform.Find("btnShop").Find("btnShop2");
+        btnShopInSetting2.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInError2 = bgError.transform.Find("btnShop").Find("btnShop2");
+        btnShopInError2.GetComponent<Button>().onClick.AddListener(Shop);
+
+        Transform btnShopInBuyHeartPrediction2 = bgBuyHeartPrediction.transform.Find("btnShop").Find("btnShop2");
+        btnShopInBuyHeartPrediction2.GetComponent<Button>().onClick.AddListener(Shop);
+        ////////////////////////
 
         btnGameBall = bgFooterPanel.transform.Find("btnGameBall");
         btnGameBall.GetComponent<Button>().onClick.AddListener(BtnBall);
@@ -86,10 +111,23 @@ public class UI : MonoBehaviour
         Transform btnBackFromCookiePrediction = bgCookiesPrediction.transform.Find("btnExit");
         btnBackFromCookiePrediction.GetComponent<Button>().onClick.AddListener(BtnBackFromCookiePrediction);
 
+        Transform btnBackFromError = bgError.transform.Find("btnExit");
+        btnBackFromError.GetComponent<Button>().onClick.AddListener(BtnBackFromError);
+
+        Transform btnBackFromShop = bgShop.transform.Find("ScrollView").Find("btnExit");
+        btnBackFromShop.GetComponent<Button>().onClick.AddListener(BtnBackFromShop);
     }
 
+    public void Error()
+    {
+        bgError.SetActive(true);
 
-
+        btnGameBall.GetComponent<Button>().interactable = false;
+        btnGameCookie.GetComponent<Button>().interactable = false;
+        btnGameHeart.GetComponent<Button>().interactable = false;
+        btnSetting.GetComponent<Button>().interactable = false;
+        btnShop.GetComponent<Button>().interactable = false;
+    }
 
     public void BuyHeart()
     {
@@ -110,15 +148,75 @@ public class UI : MonoBehaviour
         btnShop.GetComponent<Button>().interactable = true;
     }
 
-    private void BtnCookiePrediction()
+    private void Shop()
     {
-        bgCookiesPrediction.SetActive(true);
+        bgShop.SetActive(true);
 
         btnGameBall.GetComponent<Button>().interactable = false;
         btnGameCookie.GetComponent<Button>().interactable = false;
         btnGameHeart.GetComponent<Button>().interactable = false;
         btnSetting.GetComponent<Button>().interactable = false;
         btnShop.GetComponent<Button>().interactable = false;
+
+        bgBallGameWindow.GetComponent<Image>().color = new Color32(32, 6, 34, 255);
+        bgCookiesGameWindow.GetComponent<Image>().color = new Color32(32, 6, 34, 255);
+        bgHeartGameWindow.GetComponent<Image>().color = new Color32(32, 6, 34, 255);
+
+        if (bgSetting.activeInHierarchy)
+        {
+            bgSetting.SetActive(false);
+        }
+        else if (bgError.activeInHierarchy)
+        {
+            bgError.SetActive(false);
+        }
+        else if (bgBuyHeartPrediction.activeInHierarchy)
+        {
+            bgBuyHeartPrediction.SetActive(false);
+        }
+    }
+
+    private void BtnBackFromShop()
+    {
+        bgShop.SetActive(false);
+
+        btnGameBall.GetComponent<Button>().interactable = true;
+        btnGameCookie.GetComponent<Button>().interactable = true;
+        btnGameHeart.GetComponent<Button>().interactable = true;
+        btnSetting.GetComponent<Button>().interactable = true;
+        btnShop.GetComponent<Button>().interactable = true;
+
+        bgBallGameWindow.GetComponent<Image>().color = Color.white;
+        bgCookiesGameWindow.GetComponent<Image>().color = Color.white;
+        bgHeartGameWindow.GetComponent<Image>().color = Color.white;
+    }
+
+    private void BtnBackFromError()
+    {
+        bgError.SetActive(false);
+
+        btnGameBall.GetComponent<Button>().interactable = true;
+        btnGameCookie.GetComponent<Button>().interactable = true;
+        btnGameHeart.GetComponent<Button>().interactable = true;
+        btnSetting.GetComponent<Button>().interactable = true;
+        btnShop.GetComponent<Button>().interactable = true;
+
+        googleAdMobController.ShowInterstitialAd();
+    }
+
+    private void BtnCookiePrediction()
+    {
+        if (gameController.countCookie >= 0)
+        {
+            bgCookiesPrediction.SetActive(true);
+
+            btnGameBall.GetComponent<Button>().interactable = false;
+            btnGameCookie.GetComponent<Button>().interactable = false;
+            btnGameHeart.GetComponent<Button>().interactable = false;
+            btnSetting.GetComponent<Button>().interactable = false;
+            btnShop.GetComponent<Button>().interactable = false;
+        }
+
     }
 
     private void BtnBackFromCookiePrediction()
@@ -142,6 +240,7 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = true;
             btnGameCookie.GetComponent<Button>().interactable = true;
             btnGameHeart.GetComponent<Button>().interactable = true;
+            btnSetting.GetComponent<Button>().interactable = true;
             btnShop.GetComponent<Button>().interactable = true;
         }
         else if (bgCookiesGameWindow.activeInHierarchy)
@@ -152,6 +251,7 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = true;
             btnGameCookie.GetComponent<Button>().interactable = true;
             btnGameHeart.GetComponent<Button>().interactable = true;
+            btnSetting.GetComponent<Button>().interactable = true;
             btnShop.GetComponent<Button>().interactable = true;
         }
         else if (bgHeartGameWindow.activeInHierarchy)
@@ -162,6 +262,7 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = true;
             btnGameCookie.GetComponent<Button>().interactable = true;
             btnGameHeart.GetComponent<Button>().interactable = true;
+            btnSetting.GetComponent<Button>().interactable = true;
             btnShop.GetComponent<Button>().interactable = true;
         }
 
@@ -269,6 +370,7 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = false;
             btnGameCookie.GetComponent<Button>().interactable = false;
             btnGameHeart.GetComponent<Button>().interactable = false;
+            btnSetting.GetComponent<Button>().interactable = false;
             btnShop.GetComponent<Button>().interactable = false;
         }
         else if (bgCookiesGameWindow.activeInHierarchy)
@@ -279,6 +381,7 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = false;
             btnGameCookie.GetComponent<Button>().interactable = false;
             btnGameHeart.GetComponent<Button>().interactable = false;
+            btnSetting.GetComponent<Button>().interactable = false;
             btnShop.GetComponent<Button>().interactable = false;
         }
         else if (bgHeartGameWindow.activeInHierarchy)
@@ -289,12 +392,8 @@ public class UI : MonoBehaviour
             btnGameBall.GetComponent<Button>().interactable = false;
             btnGameCookie.GetComponent<Button>().interactable = false;
             btnGameHeart.GetComponent<Button>().interactable = false;
+            btnSetting.GetComponent<Button>().interactable = false;
             btnShop.GetComponent<Button>().interactable = false;
         }
-    }
-
-    private void Shop()
-    {
-        
     }
 }
