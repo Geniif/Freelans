@@ -1,0 +1,20 @@
+1.Il est certain
+2.Inévitablement
+3.Sans doute
+4.Oui absolument
+5.Cela doit être oui
+6.Il me semble que oui
+7.Le plus probable
+8.Bonnes perspectives
+9.Esprits pointent vers oui
+10.Oui
+11.La réponse n’est pas claire, essaie à nouveau                                                                                                                        essaie à nouveau
+12.Demande plus tard
+13.Il est mieux ne pas raconter
+14.Pas de réponse 
+15.Concentre-toi et demande à nouveau
+16.Ne pense même pas
+17.Étoiles disent non
+18.Selon mes données - non
+19.Perspectives ne sont pas très bonnes
+20.Très douteux

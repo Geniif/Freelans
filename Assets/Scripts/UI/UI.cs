@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,50 +7,92 @@ public class UI : MonoBehaviour
 {
     [SerializeField] private GoogleAdMobController googleAdMobController;
     [SerializeField] private GameController gameController;
-
-    [SerializeField] private Sprite gameBall;
-    [SerializeField] private Sprite gameBallActive;
-
-    [SerializeField] private Sprite gameCookie;
-    [SerializeField] private Sprite gameCookieActive;
-
-    [SerializeField] private Sprite gameHeart;
-    [SerializeField] private Sprite gameHeartActive;
+    [SerializeField] private Animation animationScript;
+    [SerializeField] private Sound sound;
+    [SerializeField] public Purchaser purchaser;
 
 
-    [SerializeField] private GameObject bgStartGame;
+    [SerializeField] public Sprite gameBall;
+    [SerializeField] public Sprite gameBallActive;
 
-    [SerializeField] private GameObject bgHeaderPanel;
-    [SerializeField] private GameObject bgFooterPanel;
+    [SerializeField] public Sprite gameCookie;
+    [SerializeField] public Sprite gameCookieActive;
 
-    [SerializeField] private GameObject bgBallGameWindow;
+    [SerializeField] public Sprite gameHeart;
+    [SerializeField] public Sprite gameHeartActive;
+    [SerializeField] public Sprite gameHeartActive2;
 
-    [SerializeField] private GameObject bgCookiesGameWindow;
-    [SerializeField] private GameObject bgClue;
 
-    [SerializeField] private GameObject bgHeartGameWindow;
-    [SerializeField] private GameObject bgSetting;
+    [SerializeField] public GameObject bgStartGame;
 
-    [SerializeField] private GameObject bgShop;
+    [SerializeField] public GameObject bgHeaderPanel;
+    [SerializeField] public GameObject bgFooterPanel;
 
-    [SerializeField] private GameObject bgHeartPrediction;
-    [SerializeField] private GameObject bgError;
-    [SerializeField] private GameObject bgBuyHeartPrediction;
-    [SerializeField] private GameObject bgCookiesPrediction;
+    [SerializeField] public GameObject bgBallGameWindow;
 
-    [SerializeField] private GameObject bgEnergy;
+    [SerializeField] public GameObject bgCookiesGameWindow;
+    [SerializeField] public GameObject bgClue;
 
-    [SerializeField] private GameObject AllCookies;
+    [SerializeField] public GameObject bgHeartGameWindow;
+    [SerializeField] public GameObject bgSetting;
 
-    private Transform btnGameBall;
-    private Transform btnGameCookie;
-    private Transform btnGameHeart;
-    private Transform btnStart;
-    private Transform btnSetting;
-    private Transform btnShop;
+    [SerializeField] public GameObject bgShop;
+
+    [SerializeField] public GameObject bgHeartPrediction;
+    [SerializeField] public GameObject bgError;
+    [SerializeField] public GameObject bgBuyHeartPrediction;
+    [SerializeField] public GameObject bgCookiesPrediction;
+
+    [SerializeField] public GameObject bgSecondPrivacyPolicy;
+
+
+    [SerializeField] public GameObject bgEnergy;
+
+    [SerializeField] public GameObject bgSystemErrorHeart;
+
+    [SerializeField] public GameObject AllCookies;
+
+    public TextHeart textHeart;
+    public TextCookie textCookie;
+
+    public string language;
+
+    public Transform btnGameBall;
+    public Transform btnGameCookie;
+    public Transform btnGameHeart;
+    public Transform btnStart;
+    public Transform btnSetting;
+    public Transform btnShop;
+
+    public int count;
 
     private void Start()
     {
+
+        count = PlayerPrefs.GetInt("Confirm", 0);
+
+        if (count == 1)
+        {
+            bgSecondPrivacyPolicy.SetActive(false);
+        }
+        else
+        {
+            bgSecondPrivacyPolicy.SetActive(true);
+        }
+
+        gameController.heartCalldown = PlayerPrefs.GetInt("HeartCalldown", 1);
+
+        if(gameController.heartCalldown == 0)
+        {
+            btnGameHeart.GetComponent<Image>().sprite = gameHeartActive2;
+        }
+        else 
+        {
+            btnGameHeart.GetComponent<Image>().sprite = gameHeartActive;
+        }
+
+        bgStartGame.SetActive(true);
+
         btnStart = bgStartGame.transform.Find("btnStart");
         btnStart.GetComponent<Button>().onClick.AddListener(StartGame);
 
@@ -88,8 +131,8 @@ public class UI : MonoBehaviour
         btnGameHeart = bgFooterPanel.transform.Find("btnGameHeart");
         btnGameHeart.GetComponent<Button>().onClick.AddListener(BtnHeart);
 
-        Transform btnStartClue = bgClue.transform.Find("btnStartClue");
-        btnStartClue.GetComponent<Button>().onClick.AddListener(BtnClue);
+        //Transform btnStartClue = bgClue.transform.Find("btnStartClue");
+        //btnStartClue.GetComponent<Button>().onClick.AddListener(BtnClue);
 
         Transform btnHeart = bgHeartGameWindow.transform.Find("btnHeart");
         btnHeart.GetComponent<Button>().onClick.AddListener(HeartPrediction);
@@ -113,14 +156,37 @@ public class UI : MonoBehaviour
 
         Transform btnBackFromError = bgError.transform.Find("btnExit");
         btnBackFromError.GetComponent<Button>().onClick.AddListener(BtnBackFromError);
+        
+        Transform btnBackFromSystemErrorHeart = bgSystemErrorHeart.transform.Find("btnExit");
+        btnBackFromSystemErrorHeart.GetComponent<Button>().onClick.AddListener(BtnBackFromSystemErrorHeart);
 
-        Transform btnBackFromShop = bgShop.transform.Find("ScrollView").Find("btnExit");
+        Transform btnBackFromShop = bgShop.transform.Find("Panel").Find("btnExit");
         btnBackFromShop.GetComponent<Button>().onClick.AddListener(BtnBackFromShop);
+
+        Transform btnBackFromSecondPrivacyPolicy = bgSecondPrivacyPolicy.transform.Find("btnExit");
+        btnBackFromSecondPrivacyPolicy.GetComponent<Button>().onClick.AddListener(BtnBackFromSecondPrivacyPolicy);
+
+        Transform btnConfirmSecondPrivacyPolicy = bgSecondPrivacyPolicy.transform.Find("btnConfirm");
+        btnConfirmSecondPrivacyPolicy.GetComponent<Button>().onClick.AddListener(BtnBackFromSecondPrivacyPolicyConfirm);
+    }
+
+    public void BtnBackFromSecondPrivacyPolicy()
+    {
+        bgSecondPrivacyPolicy.SetActive(false);
+    }
+
+    public void BtnBackFromSecondPrivacyPolicyConfirm()
+    {
+        bgSecondPrivacyPolicy.SetActive(false);
+        count = 1;
+        PlayerPrefs.SetInt("Confirm", count);
     }
 
     public void Error()
     {
         bgError.SetActive(true);
+
+        sound.Open();
 
         btnGameBall.GetComponent<Button>().interactable = false;
         btnGameCookie.GetComponent<Button>().interactable = false;
@@ -129,17 +195,24 @@ public class UI : MonoBehaviour
         btnShop.GetComponent<Button>().interactable = false;
     }
 
-    public void BuyHeart()
+    public void SystemErrorHeart()
     {
-        bgBuyHeartPrediction.SetActive(false);
+        bgSystemErrorHeart.SetActive(true);
 
-        bgBallGameWindow.SetActive(false);
-        bgCookiesGameWindow.SetActive(false);
-        bgHeartGameWindow.SetActive(true);
+        sound.Open();
 
-        btnGameBall.GetComponent<Image>().sprite = gameBall;
-        btnGameCookie.GetComponent<Image>().sprite = gameCookie;
-        btnGameHeart.GetComponent<Image>().sprite = gameHeartActive;
+        btnGameBall.GetComponent<Button>().interactable = false;
+        btnGameCookie.GetComponent<Button>().interactable = false;
+        btnGameHeart.GetComponent<Button>().interactable = false;
+        btnSetting.GetComponent<Button>().interactable = false;
+        btnShop.GetComponent<Button>().interactable = false;
+    }
+
+    private void BtnBackFromSystemErrorHeart()
+    {
+        bgSystemErrorHeart.SetActive(false);
+
+        sound.Close();
 
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
@@ -148,9 +221,30 @@ public class UI : MonoBehaviour
         btnShop.GetComponent<Button>().interactable = true;
     }
 
+    //public void BuyHeart()
+    //{
+    //    bgBuyHeartPrediction.SetActive(false);
+
+    //    bgBallGameWindow.SetActive(false);
+    //    bgCookiesGameWindow.SetActive(false);
+    //    bgHeartGameWindow.SetActive(true);
+
+    //    btnGameBall.GetComponent<Image>().sprite = gameBall;
+    //    btnGameCookie.GetComponent<Image>().sprite = gameCookie;
+    //    btnGameHeart.GetComponent<Image>().sprite = gameHeartActive;
+
+    //    btnGameBall.GetComponent<Button>().interactable = true;
+    //    btnGameCookie.GetComponent<Button>().interactable = true;
+    //    btnGameHeart.GetComponent<Button>().interactable = true;
+    //    btnSetting.GetComponent<Button>().interactable = true;
+    //    btnShop.GetComponent<Button>().interactable = true;
+    //}
+
     private void Shop()
     {
         bgShop.SetActive(true);
+
+        sound.Open();
 
         btnGameBall.GetComponent<Button>().interactable = false;
         btnGameCookie.GetComponent<Button>().interactable = false;
@@ -180,6 +274,8 @@ public class UI : MonoBehaviour
     {
         bgShop.SetActive(false);
 
+        sound.Close();
+
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
         btnGameHeart.GetComponent<Button>().interactable = true;
@@ -194,6 +290,8 @@ public class UI : MonoBehaviour
     private void BtnBackFromError()
     {
         bgError.SetActive(false);
+
+        sound.Close();
 
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
@@ -210,6 +308,15 @@ public class UI : MonoBehaviour
         {
             bgCookiesPrediction.SetActive(true);
 
+            sound.Open();
+
+            if (animationScript.anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
+            {
+                animationScript.anim.Rebind(); // Сбросить анимацию
+            }
+
+            animationScript.ChangeAnimation("CookiePredictionAnim");
+
             btnGameBall.GetComponent<Button>().interactable = false;
             btnGameCookie.GetComponent<Button>().interactable = false;
             btnGameHeart.GetComponent<Button>().interactable = false;
@@ -223,6 +330,8 @@ public class UI : MonoBehaviour
     {
         bgCookiesPrediction.SetActive(false);
 
+        sound.Close();
+
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
         btnGameHeart.GetComponent<Button>().interactable = true;
@@ -232,6 +341,8 @@ public class UI : MonoBehaviour
 
     private void BtnBackFromSetting() 
     {
+        sound.Close();
+
         if (bgBallGameWindow.activeInHierarchy)
         {
             bgBallGameWindow.GetComponent<Image>().color = Color.white;
@@ -268,20 +379,83 @@ public class UI : MonoBehaviour
 
     }
 
-    private void HeartPrediction()
+    public void HeartPrediction()
     {
-        bgHeartPrediction.SetActive(true);
+        language = PlayerPrefs.GetString("Language");
 
-        btnGameBall.GetComponent<Button>().interactable = false;
-        btnGameCookie.GetComponent<Button>().interactable = false;
-        btnGameHeart.GetComponent<Button>().interactable = false;
-        btnSetting.GetComponent<Button>().interactable = false;
-        btnShop.GetComponent<Button>().interactable = false;
+        if (language == "Eng")
+        {
+            StartCoroutine(textHeart.FileText("textHeartEng.txt"));
+        }
+        else if (language == "Ukr")
+        {
+            StartCoroutine(textHeart.FileText("textHeartUkr.txt"));
+        }
+        else if (language == "De")
+        {
+            StartCoroutine(textHeart.FileText("textHeartDe.txt"));
+        }
+        else if (language == "Fra")
+        {
+            StartCoroutine(textHeart.FileText("textHeartFra.txt"));
+        }
+
+        if (gameController.heartCalldown == -1)
+        {
+            SystemErrorHeart();
+        }
+        else
+        {
+
+            StartCoroutine(StartMethodAfterDelay());
+
+            if(purchaser.keyHeart == 0)
+            {
+                bgHeartPrediction.SetActive(true);
+
+                animationScript.ChangeAnimation("HeartClickAnim");
+                animationScript.PlayHeartPredictionAnim();
+
+                btnGameBall.GetComponent<Button>().interactable = false;
+                btnGameCookie.GetComponent<Button>().interactable = false;
+                btnGameHeart.GetComponent<Button>().interactable = false;
+                btnSetting.GetComponent<Button>().interactable = false;
+                btnShop.GetComponent<Button>().interactable = false;
+
+                gameController.heartCalldown = -1;
+            }
+            else
+            {
+                bgHeartPrediction.SetActive(true);
+
+                animationScript.ChangeAnimation("HeartClickAnim");
+                animationScript.PlayHeartPredictionAnim();
+
+                btnGameBall.GetComponent<Button>().interactable = false;
+                btnGameCookie.GetComponent<Button>().interactable = false;
+                btnGameHeart.GetComponent<Button>().interactable = false;
+                btnSetting.GetComponent<Button>().interactable = false;
+                btnShop.GetComponent<Button>().interactable = false;
+            }
+
+        }
+
+        
+    }
+
+    private IEnumerator StartMethodAfterDelay()
+    {
+        yield return new WaitForSeconds(1f); // Задержка в 3 секунды
+        sound.Heart();
     }
 
     private void BtnBackFromHeartPrediction()
     {
         bgHeartPrediction.SetActive(false);
+
+        sound.Close();
+
+        animationScript.ChangeAnimation("HeartAnim");
 
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
@@ -290,15 +464,16 @@ public class UI : MonoBehaviour
         btnShop.GetComponent<Button>().interactable = true;
     }
 
-    private void BtnClue()
-    {
-        bgClue.SetActive(false);
-    }
+    //private void BtnClue()
+    //{
+    //    bgClue.SetActive(false);
+    //}
 
     private void BtnBall()
     {
         if (!bgBallGameWindow.activeInHierarchy)
         {
+
             bgBallGameWindow.SetActive(true);
             bgCookiesGameWindow.SetActive(false);
             bgHeartGameWindow.SetActive(false);
@@ -307,10 +482,42 @@ public class UI : MonoBehaviour
             btnGameCookie.GetComponent<Image>().sprite = gameCookie;
             btnGameHeart.GetComponent<Image>().sprite = gameHeart;
         }
+
+        if(gameController.heartCalldown == 0)
+        {
+            btnGameHeart.GetComponent<Image>().sprite = gameHeartActive2;
+        }
     }
 
     private void BtnCookie()
     {
+        if (PlayerPrefs.GetString("Language") == "Eng")
+        {
+
+            textCookie.SwapLangEng();
+        }
+        else if (PlayerPrefs.GetString("Language") == "Ukr")
+        {
+
+            textCookie.SwapLangUkr();
+        }
+        else if (PlayerPrefs.GetString("Language") == "De")
+        {
+
+            textCookie.SwapLangDe();
+
+        }
+        else if (PlayerPrefs.GetString("Language") == "Fra")
+        {
+
+            textCookie.SwapLangFra();
+        }
+        else if (PlayerPrefs.GetString("Language") == "")
+        {
+            
+            textCookie.SwapLangUkr();
+        }
+
         if (!bgCookiesGameWindow.activeInHierarchy)
         {
             bgBallGameWindow.SetActive(false);
@@ -319,29 +526,112 @@ public class UI : MonoBehaviour
 
             bgClue.SetActive(true);
 
+            animationScript.PlayBgClueAnim();
+
             btnGameBall.GetComponent<Image>().sprite = gameBall;
             btnGameCookie.GetComponent<Image>().sprite = gameCookieActive;
             btnGameHeart.GetComponent<Image>().sprite = gameHeart;
+        }
+
+        if (gameController.heartCalldown == 0)
+        {
+            btnGameHeart.GetComponent<Image>().sprite = gameHeartActive2;
         }
     }
 
     private void BtnHeart()
     {
+        if(PlayerPrefs.GetString("Language") == "Eng")
+        {
+
+            textHeart.SwapLangEng();
+        }
+        else if (PlayerPrefs.GetString("Language") == "Ukr")
+        {
+
+            textHeart.SwapLangUkr();
+        }
+        else if (PlayerPrefs.GetString("Language") == "De")
+        {
+
+            textHeart.SwapLangDe();
+
+        }
+        else if (PlayerPrefs.GetString("Language") == "Fra")
+        {
+
+            textHeart.SwapLangFra();
+        }
+        else if (PlayerPrefs.GetString("Language") == "")
+        {
+;
+            textHeart.SwapLangUkr();
+        }
+
         if (!bgHeartGameWindow.activeInHierarchy)
         {
-            bgBuyHeartPrediction.SetActive(true);
+            if (gameController.heartCalldown == -1)
+            {
+                bgHeartGameWindow.SetActive(true);
 
-            btnGameBall.GetComponent<Button>().interactable = false;
-            btnGameCookie.GetComponent<Button>().interactable = false;
-            btnGameHeart.GetComponent<Button>().interactable = false;
-            btnSetting.GetComponent<Button>().interactable = false;
-            btnShop.GetComponent<Button>().interactable = false;
+
+                    animationScript.ChangeAnimation("HeartAnim");
+
+                    bgBallGameWindow.SetActive(false);
+                    bgCookiesGameWindow.SetActive(false);
+                    bgHeartGameWindow.SetActive(true);
+
+                    btnGameBall.GetComponent<Image>().sprite = gameBall;
+                    btnGameCookie.GetComponent<Image>().sprite = gameCookie;
+                    btnGameHeart.GetComponent<Image>().sprite = gameHeartActive;
+
+                    btnGameBall.GetComponent<Button>().interactable = true;
+                    btnGameCookie.GetComponent<Button>().interactable = true;
+                    btnGameHeart.GetComponent<Button>().interactable = true;
+                    btnSetting.GetComponent<Button>().interactable = true;
+                    btnShop.GetComponent<Button>().interactable = true;
+                
+            }
+            else if(gameController.heartCalldown == 1)
+            {
+                bgBuyHeartPrediction.SetActive(true);
+
+                animationScript.ChangeAnimation("HeartAnim");
+
+                btnGameBall.GetComponent<Button>().interactable = true;
+                btnGameCookie.GetComponent<Button>().interactable = true;
+                btnGameHeart.GetComponent<Button>().interactable = true;
+                btnSetting.GetComponent<Button>().interactable = true;
+                btnShop.GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                bgHeartGameWindow.SetActive(true);
+
+                animationScript.ChangeAnimation("HeartAnim");
+
+                bgBallGameWindow.SetActive(false);
+                bgCookiesGameWindow.SetActive(false);
+                bgHeartGameWindow.SetActive(true);
+
+                btnGameBall.GetComponent<Image>().sprite = gameBall;
+                btnGameCookie.GetComponent<Image>().sprite = gameCookie;
+                btnGameHeart.GetComponent<Image>().sprite = gameHeartActive;
+
+                btnGameBall.GetComponent<Button>().interactable = true;
+                btnGameCookie.GetComponent<Button>().interactable = true;
+                btnGameHeart.GetComponent<Button>().interactable = true;
+                btnSetting.GetComponent<Button>().interactable = true;
+                btnShop.GetComponent<Button>().interactable = true;
+            }
         }
     }
 
     private void BtnBackFromBgBuyHeart()
     {
         bgBuyHeartPrediction.SetActive(false);
+
+        sound.Close();
 
         btnGameBall.GetComponent<Button>().interactable = true;
         btnGameCookie.GetComponent<Button>().interactable = true;
@@ -361,6 +651,8 @@ public class UI : MonoBehaviour
 
     private void Setting()
     {
+
+        sound.Open();
 
         if (bgBallGameWindow.activeInHierarchy)
         {

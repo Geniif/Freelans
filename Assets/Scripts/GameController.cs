@@ -1,25 +1,43 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] private GoogleAdMobController googleAdMobController;
     [SerializeField] private UI ui;
     [SerializeField] private Timer timer;
+    [SerializeField] private TimerHeart timerHeart;
+    [SerializeField] private TextBall textBall;
+
+    public Sound sound;
+
+    public int heartCalldown;
 
     [SerializeField] private GameObject bgGameBall;
     [SerializeField] private GameObject bgGameCookie;
-    [SerializeField] private TextMeshProUGUI txtAnswerBall;
+    [SerializeField] public TextMeshProUGUI txtAnswerBall;
     [SerializeField] public TextMeshProUGUI txtCountAttemps;
 
+    [SerializeField] private Animation animationScript;
+
+    public TextCookie textCookie;
+
     private bool YesNo;
-    private int countGameBall = 3;
+    public int countGameBall;
 
     public int countCookie;
 
+    public int countLang;
+
+    public string language;
+
     private void Start()
     {
+
+        countGameBall = PlayerPrefs.GetInt("CountGameBall", 3);
+
         countCookie = LoadCountCookie();
         if (countCookie <= -1)
         {
@@ -58,6 +76,11 @@ public class GameController : MonoBehaviour
         //    Transform btnGameCookie = allCookies.Find("cookie" + i);
         //    btnGameCookie.GetComponent<Button>().onClick.AddListener(GameCookie);
         //}
+
+        if (countCookie > 3)
+        {
+            txtCountAttemps.text = "3X";
+        }
     }
 
     public void SaveCountCookie(int count)
@@ -73,48 +96,102 @@ public class GameController : MonoBehaviour
 
     private void GameBall()
     {
+        sound.Ball();
+
+        animationScript.PlayBallAnim();
+
+        language = PlayerPrefs.GetString("Language");
+
+        if (language == "Eng")
+        {
+            StartCoroutine(textBall.FileText("textBallEng.txt"));
+        }
+        else if (language == "Ukr")
+        {
+            StartCoroutine(textBall.FileText("textBallUkr.txt"));
+        }
+        else if (language == "De")
+        {
+            StartCoroutine(textBall.FileText("textBallDe.txt"));
+        }
+        else if (language == "Fra")
+        {
+            StartCoroutine(textBall.FileText("textBallFra.txt"));
+        }
+
         countGameBall--;
         if (countGameBall == 0)
         {
             googleAdMobController.ShowInterstitialAd();
             countGameBall = 3;
+
         }
 
         if(countGameBall == 2)
         {
             googleAdMobController.RequestAndLoadInterstitialAd();
+
         }
 
         int count = Random.Range(0, 2);
         if (count == 0)
         {
             YesNo = false;
-            txtAnswerBall.text = "Нет";
+            //txtAnswerBall.text = "Нет";
+
         }
         else
         {
             YesNo = true;
-            txtAnswerBall.text = "Так";
+            //txtAnswerBall.text = "Так";
         }
     }
 
     private void GameCookie()
     {
-        countCookie--;
-        txtCountAttemps.text = $"{countCookie}X";
-        SaveCountCookie(countCookie);
-        if (countCookie == -1)
+        sound.Cookie();
+
+        language = PlayerPrefs.GetString("Language");
+
+        if (language == "Eng")
         {
-            StartCoroutine(timer.TimerCoroutine());
-            ui.Error();
-            googleAdMobController.RequestAndLoadInterstitialAd();
+            StartCoroutine(textCookie.FileText("textCookieEng.txt"));
         }
-        else if (countCookie < -1)
+        else if (language == "Ukr")
         {
-            txtCountAttemps.gameObject.SetActive(false);
-            timer.txtTimer.gameObject.SetActive(true);
-            ui.Error();
-            googleAdMobController.RequestAndLoadInterstitialAd();
+            StartCoroutine(textCookie.FileText("textCookieUkr.txt"));
+        }
+        else if (language == "De")
+        {
+            StartCoroutine(textCookie.FileText("textCookieDe.txt"));
+        }
+        else if (language == "Fra")
+        {
+            StartCoroutine(textCookie.FileText("textCookieFra.txt"));
+        }
+
+        if (countCookie <= 3)
+        {
+            countCookie--;
+            txtCountAttemps.text = $"{countCookie}X";
+            SaveCountCookie(countCookie);
+            if (countCookie == -1)
+            {
+                StartCoroutine(timer.TimerCoroutine());
+                ui.Error();
+                googleAdMobController.RequestAndLoadInterstitialAd();
+            }
+            else if (countCookie < -1)
+            {
+                txtCountAttemps.gameObject.SetActive(false);
+                timer.txtTimer.gameObject.SetActive(true);
+                ui.Error();
+                googleAdMobController.RequestAndLoadInterstitialAd();
+            }
+        }
+        else if(countCookie > 3)
+        {
+            txtCountAttemps.text = $"3X";
         }
     }
 }

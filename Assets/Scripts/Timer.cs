@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System;
 
 public class Timer : MonoBehaviour
 {
@@ -9,10 +10,14 @@ public class Timer : MonoBehaviour
     public float timeLeft = 1800.0f; // 30 минут в секундах
     public TextMeshProUGUI txtTimer; // ссылка на UI-элемент Text дл€ отображени€ обратного отсчета
 
+    private bool isPaused = false; // флаг дл€ отслеживани€ состо€ни€ паузы
+
     void Start()
     {
-        float savedTime = PlayerPrefs.GetFloat("Time", 1800.0f);
-        timeLeft = savedTime;
+        LoadSavedTime();
+
+        //float savedTime = PlayerPrefs.GetFloat("Time", 1800.0f);
+        //timeLeft = savedTimer;
         if(gameController.countCookie <= -1)
         {
             StartCoroutine(TimerCoroutine());
@@ -45,6 +50,87 @@ public class Timer : MonoBehaviour
             PlayerPrefs.SetFloat("Time", timeLeft);
 
             yield return null;
+        }
+    }
+
+    void OnApplicationPause(bool pauseStatus)
+    {
+        isPaused = pauseStatus;
+
+        if (pauseStatus)
+        {
+            SaveCurrentTime();
+        }
+        else
+        {
+            LoadSavedTime();
+        }
+    }
+
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            if (isPaused)
+            {
+                LoadSavedTime();
+            }
+        }
+        else
+        {
+            if (!isPaused)
+            {
+                SaveCurrentTime();
+            }
+        }
+    }
+
+    //private void OnApplicationQuit()
+    //{
+    //    SaveCurrentTime(); // —охранение текущего времени при выходе из игры
+    //}
+
+    private void SaveCurrentTime()
+    {
+        // ѕолучение текущего времени на устройстве пользовател€
+        DateTime currentTime = DateTime.Now;
+
+        // ѕреобразование текущего времени в строку
+        string currentTimeString = currentTime.ToString();
+
+        // —охранение текущего времени в PlayerPrefs
+        PlayerPrefs.SetString("SavedTime", currentTimeString);
+        PlayerPrefs.Save();
+
+        Debug.Log("“екущее врем€ сохранено: " + currentTimeString);
+    }
+
+    private void LoadSavedTime()
+    {
+        if (gameController.countCookie <= -1)
+        {
+            DateTime currentTime = DateTime.Now;
+            string currentTimeString = currentTime.ToString();
+            DateTime savedDateTimeFact = DateTime.Parse(currentTimeString);
+
+            string savedTime = PlayerPrefs.GetString("SavedTime", string.Empty);
+            if (!string.IsNullOrEmpty(savedTime))
+            {
+                DateTime savedDateTime = DateTime.Parse(savedTime);
+                DateTime newDateTime = savedDateTimeFact.Subtract(savedDateTime.TimeOfDay); // ¬ычитание фактического времени
+
+                TimeSpan timeSpan = newDateTime.TimeOfDay;
+                double totalSeconds = timeSpan.TotalSeconds;
+
+
+                float savedTimer = PlayerPrefs.GetFloat("Time", 1800.0f);
+                savedTimer -= (float)totalSeconds;
+                timeLeft = savedTimer;
+
+                Debug.Log("1111 " + savedTimer);
+
+                Debug.Log("Ќовое врем€ в секундах: " + totalSeconds);
+            }
         }
     }
 }

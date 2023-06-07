@@ -1,0 +1,20 @@
+1. Das steht fest.
+2. Das ist eindeutig so.
+3. Ohne jeden Zweifel.
+4. Ja, ganz bestimmt.
+5. Darauf können Sie sich verlassen.
+6. Meines Wissens nach, ja.                
+7. Höchstwahrscheinlich.
+8. Die Aussichten sind gut.
+9. Die Zeichen stehen auf Ja.
+10. Ja.
+11. Die Antwort ist unklar, versuchen Sie es erneut.
+12. Fragen Sie später noch einmal.
+13. Das sollte ich Ihnen besser nicht sagen.
+14. Das kann ich jetzt nicht vorhersagen.
+15. Konzentrieren Sie sich und fragen Sie erneut.
+16. Verlassen Sie sich nicht darauf.
+17. Meine Antwort ist nein.
+18. Meine Quellen sagen nein.
+19. Die Aussichten sind nicht gut.
+20. Das ist sehr zweifelhaft.

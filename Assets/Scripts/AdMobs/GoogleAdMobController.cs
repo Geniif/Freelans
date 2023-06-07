@@ -58,7 +58,7 @@ public class GoogleAdMobController : MonoBehaviour
 
     private void HandleInitCompleteAction(InitializationStatus initstatus)
     {
-        Debug.Log("Initialization complete.");
+        //Debug.Log("Initialization complete.");
 
         // Callbacks from GoogleMobileAds are not guaranteed to be called on
         // the main thread.
@@ -67,7 +67,7 @@ public class GoogleAdMobController : MonoBehaviour
         MobileAdsEventExecutor.ExecuteInUpdate(() =>
         {
             // statusText.text = "Initialization complete.";
-            Debug.Log("Initialization complete.");
+            //Debug.Log("Initialization complete.");
         });
     }
 
@@ -95,9 +95,9 @@ public class GoogleAdMobController : MonoBehaviour
 #if UNITY_EDITOR
         string adUnitId = "unused";
 #elif UNITY_ANDROID
-        string adUnitId = "ca-app-pub-3940256099942544/6300978111";
+        string adUnitId = "";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/2934735716";
+        string adUnitId = "";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -172,9 +172,9 @@ public class GoogleAdMobController : MonoBehaviour
 #if UNITY_EDITOR
         string adUnitId = "unused";
 #elif UNITY_ANDROID
-        string adUnitId = "ca-app-pub-3940256099942544/1033173712";
+        string adUnitId = "ca-app-pub-5994457380587257/7512799875";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/4411468910";
+        string adUnitId = "ca-app-pub-5994457380587257/5065765782";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -189,6 +189,7 @@ public class GoogleAdMobController : MonoBehaviour
         InterstitialAd.Load(adUnitId, CreateAdRequest(),
             (InterstitialAd ad, LoadAdError loadError) =>
             {
+
                 if (loadError != null)
                 {
                     PrintStatus("Interstitial ad failed to load with error: " +
@@ -268,9 +269,9 @@ public class GoogleAdMobController : MonoBehaviour
 #if UNITY_EDITOR
         string adUnitId = "unused";
 #elif UNITY_ANDROID
-        string adUnitId = "ca-app-pub-3940256099942544/5224354917";
+        string adUnitId = "";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/1712485313";
+        string adUnitId = "";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -351,9 +352,9 @@ public class GoogleAdMobController : MonoBehaviour
 #if UNITY_EDITOR
         string adUnitId = "unused";
 #elif UNITY_ANDROID
-            string adUnitId = "ca-app-pub-3940256099942544/5354046379";
+            string adUnitId = "";
 #elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-3940256099942544/6978759866";
+            string adUnitId = "";
 #else
             string adUnitId = "unexpected_platform";
 #endif
@@ -443,7 +444,7 @@ public class GoogleAdMobController : MonoBehaviour
     public void OnAppStateChanged(AppState state)
     {
         // Display the app open ad when the app is foregrounded.
-        UnityEngine.Debug.Log("App State is " + state);
+        //UnityEngine.Debug.Log("App State is " + state);
 
         // OnAppStateChanged is not guaranteed to execute on the Unity UI thread.
         MobileAdsEventExecutor.ExecuteInUpdate(() =>
@@ -461,9 +462,9 @@ public class GoogleAdMobController : MonoBehaviour
 #if UNITY_EDITOR
         string adUnitId = "unused";
 #elif UNITY_ANDROID
-        string adUnitId = "ca-app-pub-3940256099942544/3419835294";
+        string adUnitId = "";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/5662855259";
+        string adUnitId = "";
 #else
         string adUnitId = "unexpected_platform";
 #endif
